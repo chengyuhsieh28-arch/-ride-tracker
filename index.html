@@ -2,12 +2,14 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>🚗 跑車記帳</title>
+<title>🚗 峰｜跑車記帳</title>
 
 <style>
-*{box-sizing:border-box}
+*{
+  box-sizing:border-box;
+}
 
 body{
   margin:0;
@@ -22,39 +24,21 @@ main{
   padding:18px;
 }
 
-.card{
-  background:white;
-  border-radius:18px;
-  padding:18px;
-  margin:12px 0;
-  box-shadow:0 2px 10px #0001;
+h1{
+  margin:5px 0;
 }
-
-h1{margin:5px 0}
 
 .sub{
   color:#777;
   font-size:13px;
 }
 
-input,button{
-  font-size:16px;
-  padding:12px;
-  border-radius:10px;
-}
-
-input{
-  border:1px solid #ddd;
-  width:100%;
+.card{
   background:white;
-}
-
-button{
-  border:0;
-  background:#222;
-  color:white;
-  font-weight:bold;
-  cursor:pointer;
+  border-radius:18px;
+  padding:18px;
+  margin:12px 0;
+  box-shadow:0 2px 10px #0001;
 }
 
 .row{
@@ -67,10 +51,36 @@ button{
   flex:1;
 }
 
+input,
+button{
+  font-size:16px;
+  padding:12px;
+  border-radius:10px;
+}
+
+input{
+  width:100%;
+  border:1px solid #ddd;
+  background:white;
+}
+
+button{
+  border:0;
+  background:#222;
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+button:active{
+  transform:scale(.98);
+}
+
 .summary{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:8px;
+  margin-top:12px;
 }
 
 .box{
@@ -98,16 +108,16 @@ button{
   border-bottom:1px solid #eee;
 }
 
-.del{
-  background:#fff0f0;
-  color:#c00;
-  padding:7px;
+.small{
+  color:#777;
   font-size:13px;
 }
 
-.small{
+.del{
+  background:#fff0f0;
+  color:#c00;
+  padding:7px 10px;
   font-size:13px;
-  color:#777;
 }
 </style>
 </head>
@@ -116,20 +126,20 @@ button{
 
 <main>
 
-<h1>🚗 跑車記帳</h1>
+<h1>🚗 峰｜跑車記帳</h1>
 
 <div class="sub">
-收入、加油、系統費、儲值費都會保留，不會每天歸零。
+每天輸入每趟金額即可，資料會保存，不會每天歸零。
 </div>
 
-
 <!-- 今日 -->
-
 <div class="card">
+
+<h3>📅 今天</h3>
 
 <input id="dateInput" type="date">
 
-<div class="summary" style="margin-top:12px">
+<div class="summary">
 
 <div class="box">
 <div class="label">今日收入</div>
@@ -137,7 +147,7 @@ button{
 </div>
 
 <div class="box">
-<div class="label">今日總支出</div>
+<div class="label">今日支出</div>
 <div class="num" id="todayExpense">$0</div>
 </div>
 
@@ -155,8 +165,7 @@ button{
 </div>
 
 
-<!-- 收入 -->
-
+<!-- 跑車收入 -->
 <div class="card">
 
 <h3>🚗 新增一趟</h3>
@@ -181,7 +190,6 @@ placeholder="這趟多少錢">
 
 
 <!-- 加油 -->
-
 <div class="card">
 
 <h3>⛽ 加油</h3>
@@ -206,7 +214,6 @@ placeholder="加油多少錢">
 
 
 <!-- 系統費 -->
-
 <div class="card">
 
 <h3>💳 系統費</h3>
@@ -231,7 +238,6 @@ placeholder="系統費多少錢">
 
 
 <!-- 儲值費 -->
-
 <div class="card">
 
 <h3>💰 儲值費</h3>
@@ -256,7 +262,6 @@ placeholder="儲值多少錢">
 
 
 <!-- 累計 -->
-
 <div class="card">
 
 <h3>📊 累計</h3>
@@ -298,7 +303,6 @@ placeholder="儲值多少錢">
 
 
 <!-- 每日紀錄 -->
-
 <div class="card">
 
 <h3>📅 每日紀錄</h3>
@@ -309,13 +313,12 @@ placeholder="儲值多少錢">
 
 
 <!-- 補登 -->
-
 <div class="card">
 
 <h3>📝 補登以前的總額</h3>
 
 <div class="small">
-前幾天如果只知道總額，可以直接補登。
+前幾天如果只知道總金額，可以直接補登。
 </div>
 
 <br>
@@ -358,8 +361,10 @@ placeholder="儲值費總額">
 
 <button
 id="oldSaveButton"
-style="width:100%">
+style="width:100%;">
+
 儲存這一天
+
 </button>
 
 </div>
@@ -369,56 +374,103 @@ style="width:100%">
 
 <script>
 
+/* =========================
+   資料儲存
+========================= */
+
 const STORAGE_KEY = "rideTrackerV3";
 
 let data = {};
 
-try{
-  data = JSON.parse(
-    localStorage.getItem(STORAGE_KEY) || "{}"
-  );
-}catch(e){
-  data = {};
+
+/* =========================
+   讀取資料
+========================= */
+
+function loadData(){
+
+  try{
+
+    const saved =
+      localStorage.getItem(STORAGE_KEY);
+
+    if(saved){
+
+      data = JSON.parse(saved);
+
+    }else{
+
+      data = {};
+
+    }
+
+  }catch(error){
+
+    console.log(error);
+
+    data = {};
+
+  }
+
 }
 
 
-/* 今天 */
+/* =========================
+   今天日期
+========================= */
 
 function getToday(){
 
-  const d = new Date();
+  const now = new Date();
 
-  const local = new Date(
-    d.getTime() - d.getTimezoneOffset()*60000
-  );
+  const local =
+    new Date(
+      now.getTime()
+      -
+      now.getTimezoneOffset()*60000
+    );
 
-  return local.toISOString().slice(0,10);
+  return local
+    .toISOString()
+    .slice(0,10);
 
 }
 
 
-/* 確保每天都有完整資料 */
+/* =========================
+   每一天的資料
+========================= */
 
 function getDay(date){
 
   if(!data[date]){
+
     data[date] = {};
+
   }
 
   if(!Array.isArray(data[date].trips)){
+
     data[date].trips = [];
+
   }
 
   if(!Array.isArray(data[date].gas)){
+
     data[date].gas = [];
+
   }
 
   if(!Array.isArray(data[date].system)){
+
     data[date].system = [];
+
   }
 
   if(!Array.isArray(data[date].topup)){
+
     data[date].topup = [];
+
   }
 
   return data[date];
@@ -426,495 +478,535 @@ function getDay(date){
 }
 
 
-/* 儲存 */
+/* =========================
+   儲存
+========================= */
 
-function save(){
+function saveData(){
 
-  localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify(data)
-  );
+  try{
+
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(data)
+    );
+
+  }catch(error){
+
+    alert(
+      "資料無法儲存，請確認你不是使用 Safari 私密瀏覽。"
+    );
+
+    return;
+
+  }
 
   render();
 
 }
 
 
-/* 加總 */
+/* =========================
+   加總
+========================= */
 
-function total(list){
+function sum(list){
 
-  return (list || []).reduce(
-    function(sum,value){
-      return sum + Number(value || 0);
-    },
-    0
-  );
+  return (list || [])
+    .reduce(
+      function(total,value){
+
+        return total +
+          Number(value || 0);
+
+      },
+      0
+    );
 
 }
 
 
-/* 金額 */
+/* =========================
+   金額格式
+========================= */
 
 function money(value){
 
   return "$" +
-    Math.round(Number(value || 0))
-    .toLocaleString("zh-TW");
+    Math.round(
+      Number(value || 0)
+    ).toLocaleString("zh-TW");
 
 }
 
 
-/* 新增一趟 */
+/* =========================
+   新增資料
+========================= */
 
-function addTrip(){
+function addRecord(type,inputId){
 
   const date =
-    document.getElementById("dateInput").value;
+    document.getElementById(
+      "dateInput"
+    ).value;
 
   const input =
-    document.getElementById("tripInput");
+    document.getElementById(
+      inputId
+    );
 
   const value =
     Number(input.value);
 
   if(value <= 0){
-    alert("請輸入這一趟的金額");
+
+    alert("請輸入金額");
+
     return;
+
   }
 
-  getDay(date).trips.push(value);
+  getDay(date)[type].push(value);
 
   input.value = "";
 
-  save();
+  saveData();
 
 }
 
 
-/* 新增加油 */
+/* =========================
+   刪除收入
+========================= */
 
-function addGas(){
+function deleteTrip(
+  date,
+  index
+){
 
-  const date =
-    document.getElementById("dateInput").value;
+  getDay(date)
+    .trips
+    .splice(index,1);
 
-  const input =
-    document.getElementById("gasInput");
+  saveData();
 
-  const value =
-    Number(input.value);
+}
 
-  if(value <= 0){
-    alert("請輸入加油金額");
+
+/* =========================
+   刪除支出
+========================= */
+
+function deleteExpense(
+  type,
+  date,
+  index
+){
+
+  getDay(date)[type]
+    .splice(index,1);
+
+  saveData();
+
+}
+
+
+/* =========================
+   顯示收入
+========================= */
+
+function renderTrips(
+  date,
+  day
+){
+
+  const box =
+    document.getElementById(
+      "tripList"
+    );
+
+  if(day.trips.length === 0){
+
+    box.innerHTML =
+      '<p class="small">今天還沒有收入</p>';
+
     return;
+
   }
 
-  getDay(date).gas.push(value);
+  box.innerHTML =
+    day.trips
+      .map(
+        function(value,index){
 
-  input.value = "";
+          return `
+          <div class="item">
 
-  save();
+            <span>
+              第${index+1}趟　
+              ${money(value)}
+            </span>
+
+            <button
+              class="del"
+              onclick="
+                deleteTrip(
+                  '${date}',
+                  ${index}
+                )
+              "
+            >
+              刪除
+            </button>
+
+          </div>
+          `;
+
+        }
+      )
+      .join("");
 
 }
 
 
-/* 新增系統費 */
+/* =========================
+   顯示支出
+========================= */
 
-function addSystem(){
+function renderExpense(
+  elementId,
+  type,
+  date,
+  list,
+  label
+){
 
-  const date =
-    document.getElementById("dateInput").value;
+  const box =
+    document.getElementById(
+      elementId
+    );
 
-  const input =
-    document.getElementById("systemInput");
+  if(list.length === 0){
 
-  const value =
-    Number(input.value);
+    box.innerHTML =
+      `<p class="small">
+        今天還沒有${label}
+      </p>`;
 
-  if(value <= 0){
-    alert("請輸入系統費金額");
     return;
+
   }
 
-  getDay(date).system.push(value);
+  box.innerHTML =
+    list
+      .map(
+        function(value,index){
 
-  input.value = "";
+          return `
+          <div class="item">
 
-  save();
+            <span>
+              第${index+1}次　
+              ${money(value)}
+            </span>
+
+            <button
+              class="del"
+              onclick="
+                deleteExpense(
+                  '${type}',
+                  '${date}',
+                  ${index}
+                )
+              "
+            >
+              刪除
+            </button>
+
+          </div>
+          `;
+
+        }
+      )
+      .join("");
 
 }
 
 
-/* 新增儲值費 */
+/* =========================
+   補登以前的資料
+========================= */
 
-function addTopup(){
+function saveOldDay(){
 
   const date =
-    document.getElementById("dateInput").value;
-
-  const input =
-    document.getElementById("topupInput");
-
-  const value =
-    Number(input.value);
-
-  if(value <= 0){
-    alert("請輸入儲值費金額");
-    return;
-  }
-
-  getDay(date).topup.push(value);
-
-  input.value = "";
-
-  save();
-
-}
-
-
-/* 刪除收入 */
-
-function deleteTrip(date,index){
-
-  getDay(date).trips.splice(index,1);
-
-  save();
-
-}
-
-
-/* 刪除支出 */
-
-function deleteExpense(date,type,index){
-
-  getDay(date)[type].splice(index,1);
-
-  save();
-
-}
-
-
-/* 補登以前資料 */
-
-function saveOld(){
-
-  const date =
-    document.getElementById("oldDate").value;
+    document.getElementById(
+      "oldDate"
+    ).value;
 
   if(!date){
+
     alert("請選擇日期");
+
     return;
+
   }
 
   const income =
     Number(
-      document.getElementById("oldIncome").value
+      document.getElementById(
+        "oldIncome"
+      ).value
     ) || 0;
 
   const gas =
     Number(
-      document.getElementById("oldGas").value
+      document.getElementById(
+        "oldGas"
+      ).value
     ) || 0;
 
   const system =
     Number(
-      document.getElementById("oldSystem").value
+      document.getElementById(
+        "oldSystem"
+      ).value
     ) || 0;
 
   const topup =
     Number(
-      document.getElementById("oldTopup").value
+      document.getElementById(
+        "oldTopup"
+      ).value
     ) || 0;
 
 
   data[date] = {
 
-    trips: income > 0 ? [income] : [],
+    trips:
+      income > 0
+      ? [income]
+      : [],
 
-    gas: gas > 0 ? [gas] : [],
+    gas:
+      gas > 0
+      ? [gas]
+      : [],
 
-    system: system > 0 ? [system] : [],
+    system:
+      system > 0
+      ? [system]
+      : [],
 
-    topup: topup > 0 ? [topup] : [],
+    topup:
+      topup > 0
+      ? [topup]
+      : [],
 
-    old: true
+    old:true
 
   };
 
 
-  document.getElementById("oldIncome").value = "";
+  document.getElementById(
+    "oldIncome"
+  ).value = "";
 
-  document.getElementById("oldGas").value = "";
+  document.getElementById(
+    "oldGas"
+  ).value = "";
 
-  document.getElementById("oldSystem").value = "";
+  document.getElementById(
+    "oldSystem"
+  ).value = "";
 
-  document.getElementById("oldTopup").value = "";
-
-  save();
-
-}
-
-
-/* 顯示支出列表 */
-
-function showExpenseList(
-  date,
-  list,
-  type,
-  containerId,
-  label
-){
-
-  const container =
-    document.getElementById(containerId);
-
-  if(!list.length){
-
-    container.innerHTML =
-      '<p class="small">' +
-      '今天還沒有' +
-      label +
-      '</p>';
-
-    return;
-
-  }
+  document.getElementById(
+    "oldTopup"
+  ).value = "";
 
 
-  container.innerHTML =
-    list.map(function(value,index){
-
-      return `
-
-      <div class="item">
-
-        <span>
-          第${index+1}次　${money(value)}
-        </span>
-
-        <button
-          class="del"
-          onclick="
-            deleteExpense(
-              '${date}',
-              '${type}',
-              ${index}
-            )
-          "
-        >
-          刪除
-        </button>
-
-      </div>
-
-      `;
-
-    }).join("");
+  saveData();
 
 }
 
 
-/* 顯示畫面 */
+/* =========================
+   畫面更新
+========================= */
 
 function render(){
 
   const date =
-    document.getElementById("dateInput").value;
+    document.getElementById(
+      "dateInput"
+    ).value;
 
   const day =
     getDay(date);
 
 
-  /* 今日 */
-
   const income =
-    total(day.trips);
+    sum(day.trips);
 
   const gas =
-    total(day.gas);
+    sum(day.gas);
 
   const system =
-    total(day.system);
+    sum(day.system);
 
   const topup =
-    total(day.topup);
+    sum(day.topup);
 
   const expense =
-    gas + system + topup;
+    gas +
+    system +
+    topup;
 
   const net =
-    income - expense;
+    income -
+    expense;
 
+
+  /* 今日 */
 
   document.getElementById(
     "todayIncome"
-  ).textContent = money(income);
-
+  ).textContent =
+    money(income);
 
   document.getElementById(
     "todayExpense"
-  ).textContent = money(expense);
-
+  ).textContent =
+    money(expense);
 
   document.getElementById(
     "todayNet"
-  ).textContent = money(net);
-
+  ).textContent =
+    money(net);
 
   document.getElementById(
     "todayTrips"
   ).textContent =
-    day.trips.length + " 趟";
+    day.trips.length +
+    " 趟";
 
 
-  /* 收入 */
+  /* 明細 */
 
-  const tripList =
-    document.getElementById("tripList");
+  renderTrips(
+    date,
+    day
+  );
 
-  if(day.trips.length){
-
-    tripList.innerHTML =
-      day.trips.map(function(value,index){
-
-        return `
-
-        <div class="item">
-
-          <span>
-            第${index+1}趟　${money(value)}
-          </span>
-
-          <button
-            class="del"
-            onclick="
-              deleteTrip(
-                '${date}',
-                ${index}
-              )
-            "
-          >
-            刪除
-          </button>
-
-        </div>
-
-        `;
-
-      }).join("");
-
-  }else{
-
-    tripList.innerHTML =
-      '<p class="small">今天還沒有收入</p>';
-
-  }
-
-
-  /* 三種支出 */
-
-  showExpenseList(
+  renderExpense(
+    "gasList",
+    "gas",
     date,
     day.gas,
-    "gas",
-    "gasList",
     "加油"
   );
 
-  showExpenseList(
+  renderExpense(
+    "systemList",
+    "system",
     date,
     day.system,
-    "system",
-    "systemList",
     "系統費"
   );
 
-  showExpenseList(
+  renderExpense(
+    "topupList",
+    "topup",
     date,
     day.topup,
-    "topup",
-    "topupList",
     "儲值費"
   );
 
 
   /* 累計 */
 
-  let allIncome = 0;
-
-  let allGas = 0;
-
-  let allSystem = 0;
-
-  let allTopup = 0;
+  let totalIncome = 0;
+  let totalGas = 0;
+  let totalSystem = 0;
+  let totalTopup = 0;
 
 
-  Object.values(data).forEach(function(day){
+  Object.values(data)
+    .forEach(
+      function(day){
 
-    allIncome += total(day.trips);
+        totalIncome +=
+          sum(day.trips);
 
-    allGas += total(day.gas);
+        totalGas +=
+          sum(day.gas);
 
-    allSystem += total(day.system);
+        totalSystem +=
+          sum(day.system);
 
-    allTopup += total(day.topup);
+        totalTopup +=
+          sum(day.topup);
 
-  });
+      }
+    );
 
 
-  const allExpense =
-    allGas +
-    allSystem +
-    allTopup;
+  const totalExpense =
+    totalGas +
+    totalSystem +
+    totalTopup;
 
-  const allNet =
-    allIncome -
-    allExpense;
+  const totalNet =
+    totalIncome -
+    totalExpense;
 
 
   document.getElementById(
     "totalIncome"
-  ).textContent = money(allIncome);
-
+  ).textContent =
+    money(totalIncome);
 
   document.getElementById(
     "totalGas"
-  ).textContent = money(allGas);
-
+  ).textContent =
+    money(totalGas);
 
   document.getElementById(
     "totalSystem"
-  ).textContent = money(allSystem);
-
+  ).textContent =
+    money(totalSystem);
 
   document.getElementById(
     "totalTopup"
-  ).textContent = money(allTopup);
-
+  ).textContent =
+    money(totalTopup);
 
   document.getElementById(
     "totalExpense"
-  ).textContent = money(allExpense);
-
+  ).textContent =
+    money(totalExpense);
 
   document.getElementById(
     "totalNet"
-  ).textContent = money(allNet);
+  ).textContent =
+    money(totalNet);
 
 
   /* 每日紀錄 */
 
   const history =
-    document.getElementById("historyList");
+    document.getElementById(
+      "historyList"
+    );
 
   const dates =
     Object.keys(data)
-    .sort()
-    .reverse();
+      .sort()
+      .reverse();
 
 
-  if(!dates.length){
+  if(dates.length === 0){
 
     history.innerHTML =
       '<p class="small">還沒有紀錄</p>';
@@ -925,130 +1017,167 @@ function render(){
 
 
   history.innerHTML =
-    dates.map(function(date){
+    dates
+      .map(
+        function(date){
 
-      const day =
-        getDay(date);
+          const day =
+            getDay(date);
 
-      const income =
-        total(day.trips);
+          const income =
+            sum(day.trips);
 
-      const gas =
-        total(day.gas);
+          const gas =
+            sum(day.gas);
 
-      const system =
-        total(day.system);
+          const system =
+            sum(day.system);
 
-      const topup =
-        total(day.topup);
+          const topup =
+            sum(day.topup);
 
-      const expense =
-        gas + system + topup;
+          const expense =
+            gas +
+            system +
+            topup;
 
-      const net =
-        income - expense;
+          const net =
+            income -
+            expense;
 
 
-      return `
+          return `
+          <div class="item">
 
-      <div class="item">
+            <span>
 
-        <span>
+              <b>${date}</b>
 
-          <b>${date}</b>
+              <br>
 
-          <br>
+              <small>
 
-          <small>
+                收入 ${money(income)}
 
-            收入 ${money(income)}
+                <br>
 
-            <br>
+                加油 ${money(gas)}
 
-            加油 ${money(gas)}
+                ｜ 系統費 ${money(system)}
 
-            ｜ 系統費 ${money(system)}
+                ｜ 儲值費 ${money(topup)}
 
-            ｜ 儲值費 ${money(topup)}
+              </small>
 
-          </small>
+            </span>
 
-        </span>
+            <b>
+              ${money(net)}
+            </b>
 
-        <b>
-          ${money(net)}
-        </b>
+          </div>
+          `;
 
-      </div>
-
-      `;
-
-    }).join("");
+        }
+      )
+      .join("");
 
 }
 
 
-/* 綁定按鈕 */
+/* =========================
+   綁定按鈕
+========================= */
 
 document
-  .getElementById("tripButton")
-  .addEventListener(
-    "click",
-    addTrip
-  );
+  .getElementById(
+    "tripButton"
+  )
+  .onclick =
+    function(){
 
+      addRecord(
+        "trips",
+        "tripInput"
+      );
 
-document
-  .getElementById("gasButton")
-  .addEventListener(
-    "click",
-    addGas
-  );
-
-
-document
-  .getElementById("systemButton")
-  .addEventListener(
-    "click",
-    addSystem
-  );
+    };
 
 
 document
-  .getElementById("topupButton")
-  .addEventListener(
-    "click",
-    addTopup
-  );
+  .getElementById(
+    "gasButton"
+  )
+  .onclick =
+    function(){
+
+      addRecord(
+        "gas",
+        "gasInput"
+      );
+
+    };
 
 
 document
-  .getElementById("oldSaveButton")
-  .addEventListener(
-    "click",
-    saveOld
-  );
+  .getElementById(
+    "systemButton"
+  )
+  .onclick =
+    function(){
+
+      addRecord(
+        "system",
+        "systemInput"
+      );
+
+    };
 
 
 document
-  .getElementById("dateInput")
-  .addEventListener(
-    "change",
-    render
-  );
+  .getElementById(
+    "topupButton"
+  )
+  .onclick =
+    function(){
+
+      addRecord(
+        "topup",
+        "topupInput"
+      );
+
+    };
 
 
-/* 啟動 */
+document
+  .getElementById(
+    "oldSaveButton"
+  ).onclick =
+    saveOldDay;
+
+
+document
+  .getElementById(
+    "dateInput"
+  ).onchange =
+    render;
+
+
+/* =========================
+   啟動
+========================= */
+
+loadData();
 
 document.getElementById(
   "dateInput"
-).value = getToday();
-
+).value =
+  getToday();
 
 document.getElementById(
   "oldDate"
-).value = getToday();
-
+).value =
+  getToday();
 
 render();
 
