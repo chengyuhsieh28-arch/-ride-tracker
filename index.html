@@ -4,189 +4,879 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>🚗 跑車記帳</title>
+
 <style>
-body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#f5f5f5;margin:0;color:#222}
-main{max-width:600px;margin:auto;padding:18px}
-.card{background:white;border-radius:18px;padding:18px;margin:12px 0;box-shadow:0 2px 10px #0001}
-h1{margin:5px 0}.sub{color:#777;font-size:13px}
-input,button{font-size:16px;padding:12px;border-radius:10px}
-input{border:1px solid #ddd;width:100%;box-sizing:border-box}
-button{border:0;background:#222;color:white;font-weight:bold}
-.row{display:flex;gap:8px;margin-top:8px}.row input{flex:1}
-.summary{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
-.box{background:#f5f5f5;border-radius:12px;padding:12px}
-.label{font-size:12px;color:#777}.num{font-size:20px;font-weight:bold;margin-top:5px}
-.item{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #eee}
-.del{background:#fff0f0;color:#c00;padding:7px;font-size:13px}
-.small{font-size:13px;color:#777}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC",sans-serif;
+  background:#f5f5f5;
+  margin:0;
+  color:#222;
+}
+
+main{
+  max-width:600px;
+  margin:auto;
+  padding:18px;
+}
+
+.card{
+  background:white;
+  border-radius:18px;
+  padding:18px;
+  margin:12px 0;
+  box-shadow:0 2px 10px #0001;
+}
+
+h1{
+  margin:5px 0;
+}
+
+.sub{
+  color:#777;
+  font-size:13px;
+}
+
+input,button{
+  font-size:16px;
+  padding:12px;
+  border-radius:10px;
+}
+
+input{
+  border:1px solid #ddd;
+  width:100%;
+  box-sizing:border-box;
+}
+
+button{
+  border:0;
+  background:#222;
+  color:white;
+  font-weight:bold;
+}
+
+.row{
+  display:flex;
+  gap:8px;
+  margin-top:8px;
+}
+
+.row input{
+  flex:1;
+}
+
+.summary{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+
+.box{
+  background:#f5f5f5;
+  border-radius:12px;
+  padding:12px;
+}
+
+.label{
+  font-size:12px;
+  color:#777;
+}
+
+.num{
+  font-size:20px;
+  font-weight:bold;
+  margin-top:5px;
+}
+
+.item{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px 0;
+  border-bottom:1px solid #eee;
+}
+
+.del{
+  background:#fff0f0;
+  color:#c00;
+  padding:7px;
+  font-size:13px;
+}
+
+.small{
+  font-size:13px;
+  color:#777;
+}
 </style>
 </head>
+
 <body>
+
 <main>
+
 <h1>🚗 跑車記帳</h1>
-<div class="sub">資料會保存在這台手機，不會每天歸零。</div>
+
+<div class="sub">
+收入、加油、系統費、儲值費都會保留，不會每天歸零。
+</div>
+
+
+<!-- 日期與今日統計 -->
 
 <div class="card">
+
 <input id="date" type="date">
+
 <div class="summary" style="margin-top:12px">
-<div class="box"><div class="label">今日收入</div><div class="num" id="income">$0</div></div>
-<div class="box"><div class="label">今日加油</div><div class="num" id="fuel">$0</div></div>
-<div class="box"><div class="label">今日淨額</div><div class="num" id="net">$0</div></div>
+
+<div class="box">
+<div class="label">今日收入</div>
+<div class="num" id="income">$0</div>
+</div>
+
+<div class="box">
+<div class="label">今日總支出</div>
+<div class="num" id="expense">$0</div>
+</div>
+
+<div class="box">
+<div class="label">今日淨額</div>
+<div class="num" id="net">$0</div>
+</div>
+
+<div class="box">
+<div class="label">今日趟數</div>
+<div class="num" id="tripCount">0 趟</div>
+</div>
+
 </div>
 </div>
 
+
+<!-- 跑車收入 -->
+
 <div class="card">
+
 <h3>🚗 新增一趟</h3>
+
 <div class="row">
-<input id="trip" type="number" placeholder="這趟多少錢">
-<button onclick="addTrip()">加入</button>
+
+<input
+id="trip"
+type="number"
+inputmode="numeric"
+placeholder="這趟多少錢">
+
+<button onclick="addTrip()">
+加入
+</button>
+
 </div>
+
 <div id="trips"></div>
+
 </div>
 
+
+<!-- 加油 -->
+
 <div class="card">
+
 <h3>⛽ 加油</h3>
+
 <div class="row">
-<input id="gas" type="number" placeholder="加油多少錢">
-<button onclick="addGas()">加入</button>
+
+<input
+id="gas"
+type="number"
+inputmode="numeric"
+placeholder="加油多少錢">
+
+<button onclick="addExpense('gas')">
+加入
+</button>
+
 </div>
+
 <div id="gases"></div>
+
 </div>
 
+
+<!-- 系統費 -->
+
 <div class="card">
+
+<h3>💳 系統費</h3>
+
+<div class="row">
+
+<input
+id="system"
+type="number"
+inputmode="numeric"
+placeholder="系統費多少錢">
+
+<button onclick="addExpense('system')">
+加入
+</button>
+
+</div>
+
+<div id="systems"></div>
+
+</div>
+
+
+<!-- 儲值費 -->
+
+<div class="card">
+
+<h3>💰 儲值費</h3>
+
+<div class="row">
+
+<input
+id="topup"
+type="number"
+inputmode="numeric"
+placeholder="儲值多少錢">
+
+<button onclick="addExpense('topup')">
+加入
+</button>
+
+</div>
+
+<div id="topups"></div>
+
+</div>
+
+
+<!-- 累計 -->
+
+<div class="card">
+
 <h3>📊 累計</h3>
+
 <div class="summary">
-<div class="box"><div class="label">累計收入</div><div class="num" id="allIncome">$0</div></div>
-<div class="box"><div class="label">累計加油</div><div class="num" id="allGas">$0</div></div>
-<div class="box"><div class="label">累計淨額</div><div class="num" id="allNet">$0</div></div>
+
+<div class="box">
+<div class="label">累計收入</div>
+<div class="num" id="allIncome">$0</div>
+</div>
+
+<div class="box">
+<div class="label">累計加油</div>
+<div class="num" id="allGas">$0</div>
+</div>
+
+<div class="box">
+<div class="label">累計系統費</div>
+<div class="num" id="allSystem">$0</div>
+</div>
+
+<div class="box">
+<div class="label">累計儲值費</div>
+<div class="num" id="allTopup">$0</div>
+</div>
+
+<div class="box">
+<div class="label">累計總支出</div>
+<div class="num" id="allExpense">$0</div>
+</div>
+
+<div class="box">
+<div class="label">累計淨額</div>
+<div class="num" id="allNet">$0</div>
+</div>
+
 </div>
 </div>
 
+
+<!-- 每日紀錄 -->
+
 <div class="card">
+
 <h3>📅 每日紀錄</h3>
+
 <div id="history"></div>
+
 </div>
 
+
+<!-- 補登 -->
+
 <div class="card">
+
 <h3>📝 補登以前的總額</h3>
-<p class="small">前幾天只知道總收入，也可以直接輸入。</p>
+
+<p class="small">
+如果前幾天只知道一天的總額，可以直接補登。
+</p>
+
 <input id="oldDate" type="date">
+
 <br><br>
-<input id="oldIncome" type="number" placeholder="收入總額">
+
+<input
+id="oldIncome"
+type="number"
+inputmode="numeric"
+placeholder="收入總額">
+
 <br><br>
-<input id="oldGas" type="number" placeholder="加油總額">
+
+<input
+id="oldGas"
+type="number"
+inputmode="numeric"
+placeholder="加油總額">
+
 <br><br>
-<button onclick="saveOld()" style="width:100%">儲存</button>
+
+<input
+id="oldSystem"
+type="number"
+inputmode="numeric"
+placeholder="系統費總額">
+
+<br><br>
+
+<input
+id="oldTopup"
+type="number"
+inputmode="numeric"
+placeholder="儲值費總額">
+
+<br><br>
+
+<button
+onclick="saveOld()"
+style="width:100%">
+儲存這一天
+</button>
+
 </div>
 
 </main>
 
+
 <script>
+
 const KEY="rideTracker";
-let data=JSON.parse(localStorage.getItem(KEY)||"{}");
+
+let data=
+JSON.parse(
+localStorage.getItem(KEY)||"{}"
+);
+
+
+/* 今天日期 */
 
 function today(){
- let d=new Date();
- d=new Date(d-d.getTimezoneOffset()*60000);
- return d.toISOString().slice(0,10);
+
+let d=new Date();
+
+d=new Date(
+d-d.getTimezoneOffset()*60000
+);
+
+return d.toISOString().slice(0,10);
+
 }
+
+
+/* 建立某一天 */
 
 function getDay(d){
- if(!data[d])data[d]={trips:[],gas:[]};
- return data[d];
+
+if(!data[d]){
+
+data[d]={
+
+trips:[],
+gas:[],
+system:[],
+topup:[]
+
+};
+
 }
+
+return data[d];
+
+}
+
+
+/* 儲存 */
 
 function save(){
- localStorage.setItem(KEY,JSON.stringify(data));
- render();
+
+localStorage.setItem(
+KEY,
+JSON.stringify(data)
+);
+
+render();
+
 }
 
-function sum(a){
- return a.reduce((x,y)=>x+Number(y),0);
+
+/* 加總 */
+
+function sum(arr){
+
+return (arr||[])
+.reduce(
+(a,b)=>a+Number(b),
+0
+);
+
 }
+
+
+/* 金額格式 */
 
 function money(n){
- return "$"+Math.round(n).toLocaleString();
+
+return "$"+
+Math.round(n)
+.toLocaleString();
+
 }
+
+
+/* 新增跑車收入 */
 
 function addTrip(){
- let d=date.value,v=Number(trip.value);
- if(!v)return;
- getDay(d).trips.push(v);
- trip.value="";
- save();
+
+let d=date.value;
+
+let v=Number(trip.value);
+
+if(!v)return;
+
+getDay(d)
+.trips
+.push(v);
+
+trip.value="";
+
+save();
+
 }
 
-function addGas(){
- let d=date.value,v=Number(gas.value);
- if(!v)return;
- getDay(d).gas.push(v);
- gas.value="";
- save();
+
+/* 新增加油、系統費、儲值費 */
+
+function addExpense(type){
+
+let input;
+
+if(type==="gas")
+input=gas;
+
+if(type==="system")
+input=system;
+
+if(type==="topup")
+input=topup;
+
+let d=date.value;
+
+let v=Number(input.value);
+
+if(!v)return;
+
+getDay(d)[type].push(v);
+
+input.value="";
+
+save();
+
 }
+
+
+/* 刪除收入 */
 
 function delTrip(d,i){
- data[d].trips.splice(i,1);
- save();
+
+data[d]
+.trips
+.splice(i,1);
+
+save();
+
 }
 
-function delGas(d,i){
- data[d].gas.splice(i,1);
- save();
+
+/* 刪除支出 */
+
+function delExpense(d,type,i){
+
+data[d][type]
+.splice(i,1);
+
+save();
+
 }
+
+
+/* 補登以前資料 */
 
 function saveOld(){
- let d=oldDate.value;
- let i=Number(oldIncome.value)||0;
- let g=Number(oldGas.value)||0;
- data[d]={trips:[i],gas:[g],old:true};
- oldIncome.value="";
- oldGas.value="";
- save();
+
+let d=oldDate.value;
+
+let incomeValue=
+Number(oldIncome.value)||0;
+
+let gasValue=
+Number(oldGas.value)||0;
+
+let systemValue=
+Number(oldSystem.value)||0;
+
+let topupValue=
+Number(oldTopup.value)||0;
+
+
+data[d]={
+
+trips:[incomeValue],
+
+gas:[gasValue],
+
+system:[systemValue],
+
+topup:[topupValue],
+
+old:true
+
+};
+
+
+oldIncome.value="";
+
+oldGas.value="";
+
+oldSystem.value="";
+
+oldTopup.value="";
+
+save();
+
 }
+
+
+/* 顯示紀錄 */
 
 function render(){
- let d=date.value;
- let x=getDay(d);
- let i=sum(x.trips),g=sum(x.gas);
 
- income.textContent=money(i);
- fuel.textContent=money(g);
- net.textContent=money(i-g);
+let d=date.value;
 
- trips.innerHTML=x.trips.map((v,n)=>
- `<div class="item"><span>第${n+1}趟　${money(v)}</span>
- <button class="del" onclick="delTrip('${d}',${n})">刪除</button></div>`
- ).join("")||'<p class="small">今天還沒有收入</p>';
+let x=getDay(d);
 
- gases.innerHTML=x.gas.map((v,n)=>
- `<div class="item"><span>第${n+1}次　${money(v)}</span>
- <button class="del" onclick="delGas('${d}',${n})">刪除</button></div>`
- ).join("")||'<p class="small">今天還沒有加油</p>';
 
- let ai=0,ag=0;
- Object.values(data).forEach(x=>{
-   ai+=sum(x.trips);
-   ag+=sum(x.gas);
- });
- allIncome.textContent=money(ai);
- allGas.textContent=money(ag);
- allNet.textContent=money(ai-ag);
+/* 今日 */
 
- let days=Object.keys(data).sort().reverse();
- history.innerHTML=days.map(d=>{
-   let x=data[d],i=sum(x.trips),g=sum(x.gas);
-   return `<div class="item">
-   <span><b>${d}</b><br>
-   <small>收入 ${money(i)}　加油 ${money(g)}</small></span>
-   <b>${money(i-g)}</b></div>`;
- }).join("")||'<p class="small">還沒有紀錄</p>';
+let incomeTotal=
+sum(x.trips);
+
+let gasTotal=
+sum(x.gas);
+
+let systemTotal=
+sum(x.system);
+
+let topupTotal=
+sum(x.topup);
+
+let expenseTotal=
+gasTotal+
+systemTotal+
+topupTotal;
+
+let netTotal=
+incomeTotal-
+expenseTotal;
+
+
+income.textContent=
+money(incomeTotal);
+
+expense.textContent=
+money(expenseTotal);
+
+net.textContent=
+money(netTotal);
+
+tripCount.textContent=
+x.trips.length+
+" 趟";
+
+
+/* 今日收入列表 */
+
+trips.innerHTML=
+x.trips.map(
+(v,n)=>
+
+`<div class="item">
+
+<span>
+第${n+1}趟　${money(v)}
+</span>
+
+<button
+class="del"
+onclick="delTrip('${d}',${n})">
+
+刪除
+
+</button>
+
+</div>`
+
+).join("")
+||
+'<p class="small">今天還沒有收入</p>';
+
+
+/* 加油 */
+
+gases.innerHTML=
+x.gas.map(
+(v,n)=>
+
+`<div class="item">
+
+<span>
+第${n+1}次　${money(v)}
+</span>
+
+<button
+class="del"
+onclick="delExpense('${d}','gas',${n})">
+
+刪除
+
+</button>
+
+</div>`
+
+).join("")
+||
+'<p class="small">今天還沒有加油</p>';
+
+
+/* 系統費 */
+
+systems.innerHTML=
+x.system.map(
+(v,n)=>
+
+`<div class="item">
+
+<span>
+第${n+1}次　${money(v)}
+</span>
+
+<button
+class="del"
+onclick="delExpense('${d}','system',${n})">
+
+刪除
+
+</button>
+
+</div>`
+
+).join("")
+||
+'<p class="small">今天還沒有系統費</p>';
+
+
+/* 儲值費 */
+
+topups.innerHTML=
+x.topup.map(
+(v,n)=>
+
+`<div class="item">
+
+<span>
+第${n+1}次　${money(v)}
+</span>
+
+<button
+class="del"
+onclick="delExpense('${d}','topup',${n})">
+
+刪除
+
+</button>
+
+</div>`
+
+).join("")
+||
+'<p class="small">今天還沒有儲值費</p>';
+
+
+/* 累計 */
+
+let allIncome=0;
+
+let allGas=0;
+
+let allSystem=0;
+
+let allTopup=0;
+
+
+Object.values(data)
+.forEach(x=>{
+
+allIncome+=sum(x.trips);
+
+allGas+=sum(x.gas);
+
+allSystem+=sum(x.system);
+
+allTopup+=sum(x.topup);
+
+});
+
+
+let allExpense=
+allGas+
+allSystem+
+allTopup;
+
+let allNet=
+allIncome-
+allExpense;
+
+
+document.getElementById(
+"allIncome"
+).textContent=
+money(allIncome);
+
+
+document.getElementById(
+"allGas"
+).textContent=
+money(allGas);
+
+
+document.getElementById(
+"allSystem"
+).textContent=
+money(allSystem);
+
+
+document.getElementById(
+"allTopup"
+).textContent=
+money(allTopup);
+
+
+document.getElementById(
+"allExpense"
+).textContent=
+money(allExpense);
+
+
+document.getElementById(
+"allNet"
+).textContent=
+money(allNet);
+
+
+/* 每日紀錄 */
+
+let days=
+Object.keys(data)
+.sort()
+.reverse();
+
+
+history.innerHTML=
+days.map(d=>{
+
+let x=data[d];
+
+let i=sum(x.trips);
+
+let g=sum(x.gas);
+
+let s=sum(x.system);
+
+let t=sum(x.topup);
+
+let e=g+s+t;
+
+let n=i-e;
+
+
+return `
+
+<div class="item">
+
+<span>
+
+<b>${d}</b>
+
+<br>
+
+<small>
+
+收入 ${money(i)}
+
+<br>
+
+加油 ${money(g)}
+
+｜系統費 ${money(s)}
+
+｜儲值費 ${money(t)}
+
+</small>
+
+</span>
+
+<b>
+
+${money(n)}
+
+</b>
+
+</div>
+
+`;
+
+}).join("")
+||
+'<p class="small">還沒有紀錄</p>';
+
 }
 
+
+/* 啟動 */
+
 date.value=today();
+
 oldDate.value=today();
+
 date.onchange=render;
+
 render();
+
 </script>
+
 </body>
 </html>
